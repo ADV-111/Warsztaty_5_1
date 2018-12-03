@@ -1,0 +1,54 @@
+{% extends "cwirek/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ tweet.user.profile.image.url }}">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ tweet.user }}</a>
+                <small class="text-muted">{{ tweet.creation_date|date:"F d, Y" }}</small>
+                {% if tweet.user == user %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update</a>
+                        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'tweet-delete' tweet.id %}">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+            <p class="article-content">{{ tweet.content }}</p>
+        </div>
+    </article>
+    <div class="content-section">
+        <form method="post">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <label class="border-bottom mb-4">Dodaj komentarz</label>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Zatwierdź</button>
+            </div>
+        </form>
+    </div>
+    {% if comments %}
+{% for comment in comments %}
+    <article class="media content-section ml-5">
+        <img class="rounded-circle article-img" src="{{ comment.user.profile.image.url }}">
+
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ comment.user }}</a>
+                <small class="text-muted">{{ comment.creation_date|date:"F d, Y" }}</small>
+                {% if comment.user == user %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="#">Update</a>
+                        <a class="btn btn-danger btn-sm mt-1 mb-1" href="#">Delete</a>
+                    </div>
+                {% endif %}
+            </div>
+            <p class="article-content">{{ comment.content }}</p>
+        </div><br>
+
+    </article>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}

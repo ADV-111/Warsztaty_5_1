@@ -1,0 +1,24 @@
+{% extends "cwirek/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <div class="media">
+            <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+            <div class="media-body">
+                <h2 class="account-heading">{{ user.email }}</h2>
+            </div>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <label class="border-bottom mb-4">Informacja o profilu</label>
+                {{ u_form|crispy }}
+                {{ p_form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit" name="button" value="update">Zatwierdź</button>
+                <button class="btn btn-outline-info float-right" type="submit" name="button" value="delete">Usuń konto</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

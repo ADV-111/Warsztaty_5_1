@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
-    'cwirek',
+    'cwirek.apps.CwirekConfig',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +128,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = 'main'
 LOGIN_URL = 'login'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+AUTH_USER_MODEL = 'cwirek.User'

@@ -1,12 +1,19 @@
 {% extends "cwirek/base.html" %}
 {% load extras %}
 {% block content %}
-    {% for tweet in tweets %}
-        <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ tweet.user.profile.image.url }}">
+    <h1 class="mb-3">Posts by {{ user.first_name }}, {{ user.last_name }} - {{ user.email }} ({{ page_obj.paginator.count }})</h1>
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ user.profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'user-tweets' tweet.user.id %}">{{ tweet.user }}</a>
+                <a class="mr-2" href="{% url 'user-tweets' user.id %}">{{ user }}</a>
+            </div>
+
+    {% for tweet in tweets %}
+        <article class="media content-section">
+{#        <img class="rounded-circle article-img" src="{{ tweet.user.profile.image.url }}">#}
+          <div class="media-body">
+            <div class="article-metadata">
                 <small class="text-muted">{{ tweet.creation_date|date:"F d, Y" }} </small>
             </div>
                 <a class="article-title" href="{% url 'tweet-detail' tweet.id %}">
@@ -16,6 +23,8 @@
           </div>
         </article>
     {% endfor %}
+                           </div>
+        </article>
     {% if is_paginated %}
         {% if page_obj.has_previous %}
             <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
