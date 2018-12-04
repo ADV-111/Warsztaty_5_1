@@ -1,5 +1,5 @@
 from django import forms
-from .models import Tweet, User, Profile, Comments
+from .models import Tweet, User, Profile, Comments, Messages
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -18,6 +18,15 @@ class CommentForm(forms.ModelForm):
         fields = ['content']
         labels = {
             'content': 'Zawartość komentarza',
+        }
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Messages
+        fields = ['content']
+        labels = {
+            'content': 'Zawartość wiadomości',
         }
 
 

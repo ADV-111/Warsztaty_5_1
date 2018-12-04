@@ -2,14 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, FormView, CreateView, DeleteView, DetailView
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
-from .models import Tweet, User, Comments
-from .forms import TweetForm, UserRegisterForm, ProfileUpdateForm, UserUpdateForm, CommentForm
+from .models import Tweet, User, Comments, Messages
+from .forms import TweetForm, UserRegisterForm, ProfileUpdateForm, UserUpdateForm, CommentForm, MessageForm
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
 
 
-class HomeView(ListView):
+class HomeView(LoginRequiredMixin, ListView):
     model = Tweet
     template_name = "cwirek/main.html"
     context_object_name = 'tweets'
@@ -116,19 +116,29 @@ class ConfirmDeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
         return False
 
 
-class UserTwitterListView(View):
+class UserTwitterListView(LoginRequiredMixin, View):
 
     def get(self, request, id_user):
         user = get_object_or_404(User, id=id_user)
         tweets = Tweet.objects.filter(user_id=id_user)
-        paginate_by = 5
-        # TODO paginacja nie działa trzeba cos z nia zrobic
         return render(request, "cwirek/user_tweets.html", locals())
 
 
+class MessagesView(LoginRequiredMixin, View):
 
-    # model = Tweet
-    # template_name = 'cwirek/user_tweets.html'
-    # context_object_name = 'posts'
-    # paginate_by = 5
+    def get(self, request, id_user):
+        form = MessageForm
+        user = get_object_or_404(User, id=id_user)
+        return render(request, "cwirek/message_form.html", locals())
 
+    def post(self, request, id_user):
+        form = MessageForm(request.POST)
+        user_to = get_object_or_404(User, id=id_user)
+        user_from = self.request.user
+        if form.is_valid():
+            content = form.cleaned_data.get('content')
+            message = Messages(content=content, send_to=user_to, send_from=user_from)
+            message.save()
+            messages.success(request, "Wiadomość została wysłana")
+            return redirect("user-tweets", id_user=id_user)
+        return render(request, "cwirek/message_form.html", locals())

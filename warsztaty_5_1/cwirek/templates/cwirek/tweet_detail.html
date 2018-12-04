@@ -5,7 +5,7 @@
         <img class="rounded-circle article-img" src="{{ tweet.user.profile.image.url }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ tweet.user }}</a>
+                <a class="mr-2" href="{% url 'user-tweets' tweet.user.id %}">{{ tweet.user }}</a>
                 <small class="text-muted">{{ tweet.creation_date|date:"F d, Y" }}</small>
                 {% if tweet.user == user %}
                     <div>
@@ -36,7 +36,7 @@
 
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ comment.user }}</a>
+                <a class="mr-2" href="{% url 'user-tweets' comment.user.id %}">{{ comment.user }}</a>
                 <small class="text-muted">{{ comment.creation_date|date:"F d, Y" }}</small>
                 {% if comment.user == user %}
                     <div>
