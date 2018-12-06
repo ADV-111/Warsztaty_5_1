@@ -1,0 +1,8 @@
+{% extends "cwirek/base.html" %}
+{% load extras %}
+{% block content %}
+    <h1 class="mb-3">Messages</h1>
+    <a class="btn btn-outline-info" href="{% url 'user-sent-messages' %}">Wiadomości wysłane</a>
+    <a class="btn btn-outline-info" href="{% url 'user-received-messages' %}">Wiadomości otrzymane</a>
+    {% block messages %}{% endblock %}
+{% endblock content %}

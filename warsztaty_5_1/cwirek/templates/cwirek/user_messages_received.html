@@ -1,0 +1,27 @@
+{% extends "cwirek/user_messages.html" %}
+{% load extras %}
+{% block messages %}
+    {% if msgs %}
+        {% for message in msgs %}
+            <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ message.send_from.profile.image.url }}">
+              <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'user-tweets' message.send_from.id %}">{{ message.send_from }}</a>
+                    <small class="text-muted">{{ message.send_date|date:"F d, Y" }} </small>
+                </div>
+              <a class="article-title" href="{% url 'user-message-specific' message.id %}">
+                {% if message.read == False %}
+                    <p class="article-content font-weight-bold">{{ message.content|first_signs }}</p>
+                {% else %}
+                    <p class="article-content">{{ message.content|first_signs }}</p>
+                {% endif %}
+              </a>
+                  <a class="btn btn-outline-info" href="{% url 'user-message' message.send_from.id %}">Wyślij wiadomość</a>
+              </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <h3 class="mb-3">Brak</h3>
+    {% endif %}
+{% endblock messages %}

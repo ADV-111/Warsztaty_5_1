@@ -71,7 +71,7 @@ class RegisterUserView(View):
 
     def get(self, request):
         form = self.form_class()
-        return render(request, "cwirek/register.html", {"form": self.form_class})
+        return render(request, "cwirek/register.html", locals())
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -119,7 +119,7 @@ class ConfirmDeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView)
 class UserTwitterListView(LoginRequiredMixin, View):
 
     def get(self, request, id_user):
-        user = get_object_or_404(User, id=id_user)
+        user_tweet = get_object_or_404(User, id=id_user)
         tweets = Tweet.objects.filter(user_id=id_user)
         return render(request, "cwirek/user_tweets.html", locals())
 
@@ -127,8 +127,13 @@ class UserTwitterListView(LoginRequiredMixin, View):
 class MessagesView(LoginRequiredMixin, View):
 
     def get(self, request, id_user):
-        form = MessageForm
-        user = get_object_or_404(User, id=id_user)
+        if id_user == request.user.id:
+            form = MessageForm(initial={'content': 'Oczywiście możesz napisać do siebie tylko '
+                                                   'nie spodziewaj się odpowiedzi :)'})
+            # TODO to trzeba zmienić bo podobno nie można wysyłac dos iebie wiadomosci
+        else:
+            form = MessageForm
+        user_to = get_object_or_404(User, id=id_user)
         return render(request, "cwirek/message_form.html", locals())
 
     def post(self, request, id_user):
@@ -142,3 +147,47 @@ class MessagesView(LoginRequiredMixin, View):
             messages.success(request, "Wiadomość została wysłana")
             return redirect("user-tweets", id_user=id_user)
         return render(request, "cwirek/message_form.html", locals())
+
+
+class AllMessagesView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        return render(request, "cwirek/user_messages.html", locals())
+
+
+class MessageReceivedView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        msgs = Messages.objects.filter(send_to=request.user.id).order_by("-send_date")
+        return render(request, "cwirek/user_messages_received.html", locals())
+
+
+class MessageSentView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        msgs = Messages.objects.filter(send_from=request.user.id).order_by("-send_date")
+        return render(request, "cwirek/user_messages_sent.html", locals())
+
+
+class MessageReceivedSpecificView(LoginRequiredMixin, View):
+
+    def get(self, request, id_message):
+        message = Messages.objects.filter(id=id_message, send_to=request.user.id)
+        received = True
+        if message:
+            message = message[0]
+            message.read = True
+            message.save()
+        return render(request, "cwirek/message_detail.html", locals())
+
+
+class MessageSentSpecificView(LoginRequiredMixin, View):
+
+    def get(self, request, id_message):
+        message = Messages.objects.filter(id=id_message, send_from=request.user.id)
+        received = False
+        if message:
+            message = message[0]
+            message.read = True
+            message.save()
+        return render(request, "cwirek/message_detail.html", locals())

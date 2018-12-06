@@ -1,13 +1,13 @@
 {% extends "cwirek/base.html" %}
 {% load extras %}
 {% block content %}
-    <h1 class="mb-3">Posts by {{ user.first_name }}, {{ user.last_name }} - {{ user.email }}</h1>
+    <h1 class="mb-3">Posts by {{ user_tweet.first_name }}, {{ user_tweet.last_name }} - {{ user_tweet.email }}</h1>
     <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ user.profile.image.url }}">
+        <img class="rounded-circle article-img" src="{{ user_tweet.profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="{% url 'user-tweets' user.id %}">{{ user }}</a>
-                <a class="btn btn-outline-info" href="{% url 'user-message' user.id %}">Wyślij wiadomość</a>
+                <a class="mr-2" href="{% url 'user-tweets' user_tweet.id %}">{{ user_tweet }}</a>
+                <a class="btn btn-outline-info" href="{% url 'user-message' user_tweet.id %}">Wyślij wiadomość</a>
             </div>
 
     {% for tweet in tweets %}

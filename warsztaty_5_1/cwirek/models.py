@@ -86,3 +86,6 @@ class Messages(models.Model):
     send_to = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_to")
     send_from = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_from")
     read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.content

@@ -1,0 +1,21 @@
+{% extends "cwirek/user_messages.html" %}
+{% load extras %}
+{% block messages %}
+    {% if message %}
+            <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ message.send_from.profile.image.url }}">
+              <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="{% url 'user-tweets' message.send_from.id %}">{{ message.send_from }}</a>
+                    <small class="text-muted">{{ message.send_date|date:"F d, Y" }} </small>
+                </div>
+                    <p class="article-content">{{ message.content }}</p>
+                  {% if received %}
+                    <a class="btn btn-outline-info" href="{% url 'user-message' message.send_from.id %}">Wyślij wiadomość</a>
+                  {% endif %}
+              </div>
+            </article>
+    {% else %}
+        <h3>Brak wiadomości o podanych wartościach</h3>
+    {% endif %}
+{% endblock messages %}

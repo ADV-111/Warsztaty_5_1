@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import HomeView, TweetCreateView, LoginUserView, LogoutUserView, RegisterUserView, ProfileView, \
-    ConfirmDeleteUserView, TweetDetailView, TweetDeleteView, UserTwitterListView, MessagesView
+    ConfirmDeleteUserView, TweetDetailView, TweetDeleteView, UserTwitterListView, MessagesView, MessageReceivedView, \
+    AllMessagesView, MessageSentView, MessageReceivedSpecificView, MessageSentSpecificView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='main'),
@@ -9,6 +10,11 @@ urlpatterns = [
     path('tweet_delete/<int:pk>/', TweetDeleteView.as_view(), name='tweet-delete'),
     path('user_tweets/<int:id_user>/', UserTwitterListView.as_view(), name='user-tweets'),
     path('user_message/<int:id_user>/', MessagesView.as_view(), name='user-message'),
+    path('user_received_messages/', MessageReceivedView.as_view(), name='user-received-messages'),
+    path('user_sent_messages/', MessageSentView.as_view(), name='user-sent-messages'),
+    path('user_messages/', AllMessagesView.as_view(), name='user-messages'),
+    path('user_received_messages/<int:id_message>/', MessageReceivedSpecificView.as_view(), name='user-message-specific'),
+    path('user_sent_messages/<int:id_message>/', MessageSentSpecificView.as_view(), name='user-message-sent-specific'),
     path("logout/", LogoutUserView.as_view(), name="logout"),
     path('login/', LoginUserView.as_view(), name='login'),
     path('register/', RegisterUserView.as_view(), name='register'),
