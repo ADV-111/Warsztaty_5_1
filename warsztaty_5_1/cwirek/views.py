@@ -7,6 +7,7 @@ from .forms import TweetForm, UserRegisterForm, ProfileUpdateForm, UserUpdateFor
 from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -103,6 +104,26 @@ class ProfileView(LoginRequiredMixin, View):
         elif button == 'delete':
             user = request.user
             return redirect("delete-user", pk=user.id)
+        elif button == 'change_password':
+            return redirect("change-password")
+
+
+class ChangePasswordView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        form = PasswordChangeForm(request.user)
+        return render(request, "cwirek/user_confirm_password_change.html", locals())
+
+    def post(self, request):
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_views.update_session_auth_hash(request, user)
+            messages.success(request, "Hasło zostało zmienione")
+            return redirect("profile")
+        else:
+            messages.error(request, "Prosze wprowadzić poprawne dane")
+        return render(request, "cwirek/user_confirm_password_change.html", locals())
 
 
 class ConfirmDeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -128,9 +149,7 @@ class MessagesView(LoginRequiredMixin, View):
 
     def get(self, request, id_user):
         if id_user == request.user.id:
-            form = MessageForm(initial={'content': 'Oczywiście możesz napisać do siebie tylko '
-                                                   'nie spodziewaj się odpowiedzi :)'})
-            # TODO to trzeba zmienić bo podobno nie można wysyłac dos iebie wiadomosci
+            return self.handle_no_permission()
         else:
             form = MessageForm
         user_to = get_object_or_404(User, id=id_user)
@@ -145,7 +164,7 @@ class MessagesView(LoginRequiredMixin, View):
             message = Messages(content=content, send_to=user_to, send_from=user_from)
             message.save()
             messages.success(request, "Wiadomość została wysłana")
-            return redirect("user-tweets", id_user=id_user)
+            return redirect("user-messages")
         return render(request, "cwirek/message_form.html", locals())
 
 
@@ -178,7 +197,9 @@ class MessageReceivedSpecificView(LoginRequiredMixin, View):
             message = message[0]
             message.read = True
             message.save()
-        return render(request, "cwirek/message_detail.html", locals())
+            return render(request, "cwirek/message_detail.html", locals())
+        else:
+            return self.handle_no_permission()
 
 
 class MessageSentSpecificView(LoginRequiredMixin, View):
@@ -188,6 +209,7 @@ class MessageSentSpecificView(LoginRequiredMixin, View):
         received = False
         if message:
             message = message[0]
-            message.read = True
-            message.save()
-        return render(request, "cwirek/message_detail.html", locals())
+            return render(request, "cwirek/message_detail.html", locals())
+        else:
+            return self.handle_no_permission()
+

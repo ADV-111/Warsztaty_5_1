@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import HomeView, TweetCreateView, LoginUserView, LogoutUserView, RegisterUserView, ProfileView, \
     ConfirmDeleteUserView, TweetDetailView, TweetDeleteView, UserTwitterListView, MessagesView, MessageReceivedView, \
-    AllMessagesView, MessageSentView, MessageReceivedSpecificView, MessageSentSpecificView
+    AllMessagesView, MessageSentView, MessageReceivedSpecificView, MessageSentSpecificView, ChangePasswordView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='main'),
@@ -19,5 +19,6 @@ urlpatterns = [
     path('login/', LoginUserView.as_view(), name='login'),
     path('register/', RegisterUserView.as_view(), name='register'),
     path('profile/', ProfileView.as_view(), name='profile'),
+    path('change_password/', ChangePasswordView.as_view(), name='change-password'),
     path('delete_user/<int:pk>/', ConfirmDeleteUserView.as_view(), name='delete-user'),
 ]

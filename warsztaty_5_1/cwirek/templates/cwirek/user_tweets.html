@@ -7,7 +7,9 @@
           <div class="media-body">
             <div class="article-metadata">
                 <a class="mr-2" href="{% url 'user-tweets' user_tweet.id %}">{{ user_tweet }}</a>
-                <a class="btn btn-outline-info" href="{% url 'user-message' user_tweet.id %}">Wyślij wiadomość</a>
+                {% if id_user != request.user.id %}
+                    <a class="btn btn-outline-info" href="{% url 'user-message' user_tweet.id %}">Wyślij wiadomość</a>
+                {% endif %}
             </div>
 
     {% for tweet in tweets %}

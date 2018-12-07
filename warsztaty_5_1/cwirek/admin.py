@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tweet, User, Profile
+from .models import Tweet, User, Profile, Messages, Comments
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.utils.translation import ugettext_lazy as _
 
@@ -28,4 +28,5 @@ class UserAdmin(DjangoUserAdmin):
 
 admin.site.register(Tweet)
 admin.site.register(Profile)
-
+admin.site.register(Messages)
+admin.site.register(Comments)
