@@ -30,3 +30,5 @@ admin.site.register(Tweet)
 admin.site.register(Profile)
 admin.site.register(Messages)
 admin.site.register(Comments)
+
+#TODO Zadanie 6 (dodatkowe)
