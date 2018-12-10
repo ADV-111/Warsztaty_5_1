@@ -1,9 +1,7 @@
 from django.contrib.auth.forms import PasswordChangeForm
-from django.http import HttpRequest
-from django.template.loader import render_to_string
 from django.test import TestCase
 
-from .forms import TweetForm, CommentForm, MessageForm, UserUpdateForm, ProfileUpdateForm
+from .forms import TweetForm, CommentForm, MessageForm, UserUpdateForm, ProfileUpdateForm, UserRegisterForm
 from .models import Tweet, User, Comments, Messages
 from django.urls import reverse
 
@@ -373,3 +371,78 @@ class LoggedOutTest(TestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
 
+
+class FormTest(TestCase):
+
+    def test_valid_tweet_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        t = Tweet.objects.create(content="Przykladowy content", user=user1)
+        data = {'content': t.content}
+        form = TweetForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_tweet_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        content = ""
+        t = Tweet.objects.create(content=content, user=user1)
+        data = {'content': t.content}
+        form = TweetForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_comment_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        t = Tweet.objects.create(content="Przykladowy content", user=user1)
+        m = Comments.objects.create(content="Przykladowy content", user=user1, tweet=t)
+        data = {'content': t.content}
+        form = CommentForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_comment_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        t = Tweet.objects.create(content="Przykladowy content", user=user1)
+        m = Comments.objects.create(content="", user=user1, tweet=t)
+        data = {'content': m.content}
+        form = CommentForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_message_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        user2 = User.objects.create_user(email='testuser3@mail.com', password='12345')
+        m = Messages.objects.create(content="Przykladowy conent", send_to=user1, send_from=user2)
+        data = {'content': m.content}
+        form = MessageForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_message_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345')
+        user2 = User.objects.create_user(email='testuser3@mail.com', password='12345')
+        m = Messages.objects.create(content="", send_to=user1, send_from=user2)
+        data = {'content': m.content}
+        form = MessageForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_user_register_form(self):
+        data = {'email': 'testuser15@mail.com', 'password1': 'nowehaslo15', 'password2': 'nowehaslo15',
+                'first_name': 'aaba', 'last_name': 'dsaba'}
+        form = UserRegisterForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_user_register_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa', last_name='bbb')
+        data = {'email': user1.email, 'password1': user1.password, 'password2': '54321',
+                'first_name': user1.first_name, 'last_name': user1.last_name}
+        form = UserRegisterForm(data=data)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_user_update_form(self):
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa', last_name='bbb')
+        data = {'first_name': user1.first_name, 'last_name': user1.last_name}
+        form = UserUpdateForm(data=data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_user_update_form(self):
+        first_name = 'aaadsafsgfdhfdshgfhjgfjgfjgjghfdhgfkhgdfhgfkhgdfhgfdhjgfkjgfhgfkgfddhgfdhgfdhgfddhgfdhdg'
+        last_name = ''
+        data = {'first_name': first_name, 'last_name': last_name}
+        form = UserUpdateForm(data=data)
+        self.assertFalse(form.is_valid())
