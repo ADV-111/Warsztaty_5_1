@@ -26,9 +26,35 @@ class UserAdmin(DjangoUserAdmin):
     ordering = ('email',)
 
 
-admin.site.register(Tweet)
 admin.site.register(Profile)
-admin.site.register(Messages)
-admin.site.register(Comments)
 
-#TODO Zadanie 6 (dodatkowe)
+
+def content_display_thirty_signs(obj):
+    return str(obj.content)[0:30]
+content_display_thirty_signs.short_description = 'content'
+
+
+def deleted(model_admin, request, query_set):
+    query_set.update(deleted=True)
+deleted.short_description = "Ukryj element w widoku"
+
+
+@admin.register(Tweet)
+class TweetAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', content_display_thirty_signs, 'creation_date', 'deleted']
+    list_filter = ['user', 'creation_date', 'deleted']
+    actions = [deleted, ]
+
+
+@admin.register(Messages)
+class MessagesAdmin(admin.ModelAdmin):
+    list_display = ['id', 'send_date', 'send_from', 'send_to', content_display_thirty_signs, 'read', 'deleted']
+    list_filter = ['send_date', 'deleted']
+    actions = [deleted, ]
+
+
+@admin.register(Comments)
+class CommentsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'creation_date', 'tweet', 'user', content_display_thirty_signs, 'deleted']
+    list_filter = ['creation_date', 'user', 'deleted']
+    actions = [deleted, ]

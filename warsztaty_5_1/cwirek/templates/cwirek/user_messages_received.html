@@ -10,7 +10,7 @@
                     <a class="mr-2" href="{% url 'user-tweets' message.send_from.id %}">{{ message.send_from }}</a>
                     <small class="text-muted">{{ message.send_date|date:"F d, Y" }} </small>
                 </div>
-              <a class="article-title" href="{% url 'user-message-specific' message.id %}">
+              <a class="article-title" href="{% url 'user-message-received-specific' message.id %}">
                 {% if message.read == False %}
                     <p class="article-content font-weight-bold">{{ message.content|first_signs }}</p>
                 {% else %}

@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth import views as auth_views
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+from warsztaty_5_1.settings import LOGIN_REDIRECT_URL
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -16,6 +17,10 @@ class HomeView(LoginRequiredMixin, ListView):
     context_object_name = 'tweets'
     ordering = ['-creation_date']
     paginate_by = 10
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(deleted=False)
 
 
 class TweetCreateView(LoginRequiredMixin, FormView):
@@ -32,9 +37,9 @@ class TweetCreateView(LoginRequiredMixin, FormView):
 class TweetDetailView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        tweet = get_object_or_404(Tweet, pk=pk)
+        tweet = get_object_or_404(Tweet, pk=pk, deleted=False)
         form = CommentForm()
-        comments = Comments.objects.filter(tweet_id=tweet.id)
+        comments = Comments.objects.filter(tweet_id=tweet.id, deleted=False)
         return render(request, "cwirek/tweet_detail.html", locals())
 
     def post(self, request, pk):
@@ -60,6 +65,7 @@ class TweetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 class LoginUserView(auth_views.LoginView):
+    redirect_authenticated_user = True
     template_name = "cwirek/login.html"
 
 
@@ -72,6 +78,8 @@ class RegisterUserView(View):
 
     def get(self, request):
         form = self.form_class()
+        if request.user.is_authenticated:
+            return redirect(LOGIN_REDIRECT_URL)
         return render(request, "cwirek/register.html", locals())
 
     def post(self, request):
@@ -141,7 +149,7 @@ class UserTwitterListView(LoginRequiredMixin, View):
 
     def get(self, request, id_user):
         user_tweet = get_object_or_404(User, id=id_user)
-        tweets = Tweet.objects.filter(user_id=id_user)
+        tweets = Tweet.objects.filter(user_id=id_user, deleted=False)
         return render(request, "cwirek/user_tweets.html", locals())
 
 
@@ -177,21 +185,21 @@ class AllMessagesView(LoginRequiredMixin, View):
 class MessageReceivedView(LoginRequiredMixin, View):
 
     def get(self, request):
-        msgs = Messages.objects.filter(send_to=request.user.id).order_by("-send_date")
+        msgs = Messages.objects.filter(send_to=request.user.id, deleted=False).order_by("-send_date")
         return render(request, "cwirek/user_messages_received.html", locals())
 
 
 class MessageSentView(LoginRequiredMixin, View):
 
     def get(self, request):
-        msgs = Messages.objects.filter(send_from=request.user.id).order_by("-send_date")
+        msgs = Messages.objects.filter(send_from=request.user.id, deleted=False).order_by("-send_date")
         return render(request, "cwirek/user_messages_sent.html", locals())
 
 
 class MessageReceivedSpecificView(LoginRequiredMixin, View):
 
     def get(self, request, id_message):
-        message = Messages.objects.filter(id=id_message, send_to=request.user.id)
+        message = Messages.objects.filter(id=id_message, send_to=request.user.id, deleted=False)
         received = True
         if message:
             message = message[0]
@@ -205,7 +213,7 @@ class MessageReceivedSpecificView(LoginRequiredMixin, View):
 class MessageSentSpecificView(LoginRequiredMixin, View):
 
     def get(self, request, id_message):
-        message = Messages.objects.filter(id=id_message, send_from=request.user.id)
+        message = Messages.objects.filter(id=id_message, send_from=request.user.id, deleted=False)
         received = False
         if message:
             message = message[0]

@@ -71,6 +71,7 @@ class Tweet(models.Model):
     content = models.CharField(max_length=140)
     creation_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user} >>> {self.content[0:30]}"
@@ -81,6 +82,7 @@ class Comments(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     tweet = models.ForeignKey(Tweet, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user} - {self.tweet} >>> {self.content[0:30]}"
@@ -92,6 +94,7 @@ class Messages(models.Model):
     send_to = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_to")
     send_from = models.ForeignKey(User, on_delete=models.SET("Deleted"), related_name="user_from")
     read = models.BooleanField(default=False)
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.send_from} - {self.send_to} >>> {self.content[0:30]}"
