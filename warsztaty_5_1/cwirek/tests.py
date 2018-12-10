@@ -1,6 +1,5 @@
 from django.contrib.auth.forms import PasswordChangeForm
 from django.test import TestCase
-
 from .forms import TweetForm, CommentForm, MessageForm, UserUpdateForm, ProfileUpdateForm, UserRegisterForm
 from .models import Tweet, User, Comments, Messages
 from django.urls import reverse
@@ -12,7 +11,7 @@ class CwirekTest(TestCase):
         self.user = User.objects.create_user(email='testuser@mail.com', password='12345')
         login = self.client.login(email='testuser@mail.com', password='12345')
 
-# models
+    # models
     def create_tweet(self):
         content = "Przykladowy content"
         deleted = False
@@ -55,7 +54,7 @@ class CwirekTest(TestCase):
         self.assertFalse(m.deleted)
         self.assertEqual(m.__str__(), should_get)
 
-# views
+    # views
     def test_home_view(self):
         t = self.create_tweet()
         url = reverse("main")
@@ -428,14 +427,16 @@ class FormTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_invalid_user_register_form(self):
-        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa', last_name='bbb')
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa',
+                                         last_name='bbb')
         data = {'email': user1.email, 'password1': user1.password, 'password2': '54321',
                 'first_name': user1.first_name, 'last_name': user1.last_name}
         form = UserRegisterForm(data=data)
         self.assertFalse(form.is_valid())
 
     def test_valid_user_update_form(self):
-        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa', last_name='bbb')
+        user1 = User.objects.create_user(email='testuser2@mail.com', password='12345', first_name='aaa',
+                                         last_name='bbb')
         data = {'first_name': user1.first_name, 'last_name': user1.last_name}
         form = UserUpdateForm(data=data)
         self.assertTrue(form.is_valid())

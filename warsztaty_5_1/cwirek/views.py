@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import ListView, FormView, CreateView, DeleteView, DetailView
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView, FormView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Tweet, User, Comments, Messages
 from .forms import TweetForm, UserRegisterForm, ProfileUpdateForm, UserUpdateForm, CommentForm, MessageForm
 from django.urls import reverse_lazy
@@ -220,4 +220,3 @@ class MessageSentSpecificView(LoginRequiredMixin, View):
             return render(request, "cwirek/message_detail.html", locals())
         else:
             return self.handle_no_permission()
-

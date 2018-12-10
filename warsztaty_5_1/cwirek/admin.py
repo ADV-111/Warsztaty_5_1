@@ -31,11 +31,15 @@ admin.site.register(Profile)
 
 def content_display_thirty_signs(obj):
     return str(obj.content)[0:30]
+
+
 content_display_thirty_signs.short_description = 'content'
 
 
 def deleted(model_admin, request, query_set):
     query_set.update(deleted=True)
+
+
 deleted.short_description = "Ukryj element w widoku"
 
 
