@@ -40,7 +40,8 @@ class TweetDetailView(LoginRequiredMixin, View):
         tweet = get_object_or_404(Tweet, pk=pk, deleted=False)
         form = CommentForm()
         comments = Comments.objects.filter(tweet_id=tweet.id, deleted=False)
-        return render(request, "cwirek/tweet_detail.html", locals())
+        context = {'tweet': tweet, 'form': form, 'comments': comments}
+        return render(request, "cwirek/tweet_detail.html", context)
 
     def post(self, request, pk):
         tweet = get_object_or_404(Tweet, pk=pk)
@@ -80,7 +81,7 @@ class RegisterUserView(View):
         form = self.form_class()
         if request.user.is_authenticated:
             return redirect(LOGIN_REDIRECT_URL)
-        return render(request, "cwirek/register.html", locals())
+        return render(request, "cwirek/register.html", {'form': form})
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -97,7 +98,7 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
-        return render(request, 'cwirek/profile.html', locals())
+        return render(request, 'cwirek/profile.html', {'u_form': u_form, 'p_form': p_form})
 
     def post(self, request):
         u_form = UserUpdateForm(request.POST, instance=request.user)
@@ -120,7 +121,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
 
     def get(self, request):
         form = PasswordChangeForm(request.user)
-        return render(request, "cwirek/user_confirm_password_change.html", locals())
+        return render(request, "cwirek/user_confirm_password_change.html", {'form': form})
 
     def post(self, request):
         form = PasswordChangeForm(request.user, request.POST)
@@ -131,7 +132,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
             return redirect("profile")
         else:
             messages.error(request, "Prosze wprowadzić poprawne dane")
-        return render(request, "cwirek/user_confirm_password_change.html", locals())
+        return render(request, "cwirek/user_confirm_password_change.html", {'form': form})
 
 
 class ConfirmDeleteUserView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -150,7 +151,7 @@ class UserTwitterListView(LoginRequiredMixin, View):
     def get(self, request, id_user):
         user_tweet = get_object_or_404(User, id=id_user)
         tweets = Tweet.objects.filter(user_id=id_user, deleted=False)
-        return render(request, "cwirek/user_tweets.html", locals())
+        return render(request, "cwirek/user_tweets.html", {'user_tweet': user_tweet, 'tweets': tweets, 'id_user': id_user})
 
 
 class MessagesView(LoginRequiredMixin, View):
@@ -158,10 +159,9 @@ class MessagesView(LoginRequiredMixin, View):
     def get(self, request, id_user):
         if id_user == request.user.id:
             return self.handle_no_permission()
-        else:
-            form = MessageForm
+        form = MessageForm
         user_to = get_object_or_404(User, id=id_user)
-        return render(request, "cwirek/message_form.html", locals())
+        return render(request, "cwirek/message_form.html", {'form': form, 'user_to': user_to})
 
     def post(self, request, id_user):
         form = MessageForm(request.POST)
@@ -173,27 +173,27 @@ class MessagesView(LoginRequiredMixin, View):
             message.save()
             messages.success(request, "Wiadomość została wysłana")
             return redirect("user-messages")
-        return render(request, "cwirek/message_form.html", locals())
+        return render(request, "cwirek/message_form.html", {'form': form, 'user_to': user_to, 'user_from': user_from})
 
 
 class AllMessagesView(LoginRequiredMixin, View):
 
     def get(self, request):
-        return render(request, "cwirek/user_messages.html", locals())
+        return render(request, "cwirek/user_messages.html")
 
 
 class MessageReceivedView(LoginRequiredMixin, View):
 
     def get(self, request):
         msgs = Messages.objects.filter(send_to=request.user.id, deleted=False).order_by("-send_date")
-        return render(request, "cwirek/user_messages_received.html", locals())
+        return render(request, "cwirek/user_messages_received.html", {'msgs': msgs})
 
 
 class MessageSentView(LoginRequiredMixin, View):
 
     def get(self, request):
         msgs = Messages.objects.filter(send_from=request.user.id, deleted=False).order_by("-send_date")
-        return render(request, "cwirek/user_messages_sent.html", locals())
+        return render(request, "cwirek/user_messages_sent.html", {'msgs': msgs})
 
 
 class MessageReceivedSpecificView(LoginRequiredMixin, View):
@@ -205,7 +205,7 @@ class MessageReceivedSpecificView(LoginRequiredMixin, View):
             message = message[0]
             message.read = True
             message.save()
-            return render(request, "cwirek/message_detail.html", locals())
+            return render(request, "cwirek/message_detail.html", {'message': message, 'received': received})
         else:
             return self.handle_no_permission()
 
@@ -217,6 +217,6 @@ class MessageSentSpecificView(LoginRequiredMixin, View):
         received = False
         if message:
             message = message[0]
-            return render(request, "cwirek/message_detail.html", locals())
+            return render(request, "cwirek/message_detail.html", {'message': message, 'received': received})
         else:
             return self.handle_no_permission()
